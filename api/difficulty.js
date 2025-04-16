@@ -11,17 +11,23 @@ export default async function handler(req, res) {
     const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(keyword)}`;
     const response = await fetch(googleUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
       }
     });
+
     const html = await response.text();
+
+    if (!html.includes('About') || html.includes('Our systems have detected unusual traffic')) {
+      return res.status(200).json({ keyword, difficulty: "Unknown", error: "Blocked or redirected" });
+    }
 
     const resultMatch = html.match(/About ([\d,]+) results/i);
     const resultCount = resultMatch ? parseInt(resultMatch[1].replace(/,/g, '')) : 0;
 
     const hasAds = html.includes("Ad") || html.includes("Sponsored");
 
-    const titleMatch = new RegExp(`<h3.*?>.*?${keyword}.*?</h3>`, 'i');
+    const titleMatch = new RegExp(`<h3.*?>.*?${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?</h3>`, 'i');
     const exactMatchTitle = titleMatch.test(html);
 
     let score = 0;

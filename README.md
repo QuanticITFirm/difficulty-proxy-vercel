@@ -1,2 +1,1 @@
-# DIY Keyword Difficulty Proxy
-Estimates keyword competition using Google search results, ads, and title match patterns.
+# Improved Keyword Difficulty Proxy\nEstimates competition using Google results. Includes stronger headers to avoid blocks.
